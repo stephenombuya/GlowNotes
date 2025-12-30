@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GlowNotes - Smart Notes, Bright Ideas</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body class="login-body">
+
+        <canvas id="particle-canvas"></canvas>
+
+        <header class="site-header">
+            <h1>GlowNotes</h1>
+            <nav>
+                <a href="login.html">Login</a>
+                <a href="signup.html" class="cta-button">Sign Up</a>
+            </nav>
+        </header>
+
+        <main class="landing-main">
+            <h2>Brighten Your Ideas, Keep Them Safe</h2>
+            <p>GlowNotes is the futuristic note-taking app that makes writing fun, simple, and secure.</p>
+            <div class="landing-buttons">
+                <a href="signup.html" class="cta-button">Get Started</a>
+                <a href="signup.html" class="cta-button secondary" id="add-note-btn">+ Add Note</a>
+                <a href="login.html" class="cta-button secondary">Login</a>
+            </div>
+        </main>
+
+        <script>
+        // Particle effect copied from login/signup pages
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 1;
+                this.speedY = (Math.random() - 0.5) * 1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if(this.x > canvas.width) this.x = 0;
+                if(this.x < 0) this.x = canvas.width;
+                if(this.y > canvas.height) this.y = 0;
+                if(this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                ctx.beginPath();
+                ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            const count = Math.floor(canvas.width / 10);
+            for(let i=0;i<count;i++) particlesArray.push(new Particle());
+        }
+        initParticles();
+
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            particlesArray.forEach(p=>{p.update(); p.draw();});
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Check if user is logged in
+        if(localStorage.getItem('loggedIn') === 'true') {
+            window.location.href = "dashboard.html";
+        }
+
+        // Redirect "Add Note" to signup if not logged in
+        document.getElementById('add-note-btn').addEventListener('click', () => {
+            window.location.href = "signup.html";
+        });
+        
+        </script>
+
+        <style>
+            .site-header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                padding: 20px 50px;
+                color: #fff;
+                font-weight: 600;
+            }
+            .site-header nav a {
+                margin-left: 20px;
+                color: #fff;
+                text-decoration: none;
+                padding: 10px 20px;
+                border-radius: 6px;
+                transition: all 0.3s ease;
+            }
+            .site-header nav a.cta-button {
+                background: var(--main-color);
+            }
+            .site-header nav a.cta-button:hover {
+                background: #36b48c;
+            }
+            .landing-main {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: #fff;
+                text-align: center;
+                max-width: 600px;
+            }
+            .landing-main h2 {
+                font-size: 2.8rem;
+                margin-bottom: 15px;
+            }
+            .landing-main p {
+                font-size: 1.2rem;
+                margin-bottom: 30px;
+            }
+            .landing-buttons a {
+                margin: 0 10px;
+                text-decoration: none;
+                color: #fff;
+                padding: 12px 25px;
+                border-radius: 8px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+            .landing-buttons a.cta-button {
+                background: var(--main-color);
+            }
+            .landing-buttons a.cta-button:hover {
+                background: #36b48c;
+            }
+            .landing-buttons a.secondary {
+                background: rgba(255,255,255,0.2);
+            }
+            .landing-buttons a.secondary:hover {
+                background: rgba(255,255,255,0.35);
+            }
+        </style>
+
+    </body>
+</html>
