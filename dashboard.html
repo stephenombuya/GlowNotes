@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GlowNotes Dashboard</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body class="login-body">
+
+        <canvas id="particle-canvas"></canvas>
+
+        <header class="site-header">
+            <h1>GlowNotes</h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="login.html">Logout</a>
+            </nav>
+        </header>
+
+        <main class="dashboard-main">
+            <h2>Welcome, Masterpiece!</h2>
+            <p>Here are your notes:</p>
+
+            <div class="notes-container">
+                <div class="note-card">Buy groceries</div>
+                <div class="note-card">Finish project proposal</div>
+                <div class="note-card">Call Alice</div>
+                <div class="note-card">Ideas for GlowNotes</div>
+            </div>
+
+            <button id="add-note">+ Add Note</button>
+        </main>
+
+        <script>
+            // Same particle animation code as before
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particlesArray;
+            function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.addEventListener('resize', initCanvas);
+            initCanvas();
+            class Particle { constructor() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.size = Math.random()*3+1; this.speedX=(Math.random()-0.5)*1; this.speedY=(Math.random()-0.5)*1; } update(){ this.x+=this.speedX; this.y+=this.speedY; if(this.x>canvas.width)this.x=0; if(this.x<0)this.x=canvas.width; if(this.y>canvas.height)this.y=0; if(this.y<0)this.y=canvas.height; } draw(){ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill();} }
+            function initParticles(){particlesArray=[]; const count=Math.floor(canvas.width/10); for(let i=0;i<count;i++)particlesArray.push(new Particle());}
+            initParticles();
+            function animate(){ctx.clearRect(0,0,canvas.width,canvas.height); particlesArray.forEach(p=>{p.update(); p.draw();}); requestAnimationFrame(animate);}
+            animate();
+
+            // Redirect if not logged in
+        if(localStorage.getItem('loggedIn') !== 'true') {
+            window.location.href = "login.html";
+        }
+
+        // Display welcome name
+        const user = JSON.parse(localStorage.getItem('user'));
+        document.querySelector('h2').textContent = `Welcome, ${user.name}!`;
+
+        // Add note functionality
+        const addNoteBtn = document.getElementById('add-note');
+        const notesContainer = document.querySelector('.notes-container');
+
+        addNoteBtn.addEventListener('click', () => {
+            const noteText = prompt("Enter your note:");
+            if(noteText && noteText.trim() !== "") {
+                const newNote = document.createElement('div');
+                newNote.classList.add('note-card');
+                newNote.textContent = noteText;
+                notesContainer.appendChild(newNote);
+                
+                // Save notes in localStorage
+                let notes = JSON.parse(localStorage.getItem('notes')) || [];
+                notes.push(noteText);
+                localStorage.setItem('notes', JSON.stringify(notes));
+            }
+        });
+
+        // Load saved notes on page load
+        const savedNotes = JSON.parse(localStorage.getItem('notes')) || [];
+        savedNotes.forEach(text => {
+            const note = document.createElement('div');
+            note.classList.add('note-card');
+            note.textContent = text;
+            notesContainer.appendChild(note);
+        });
+
+        // Logout button
+        document.querySelector('a[href="login.html"]').addEventListener('click', () => {
+            localStorage.removeItem('loggedIn');
+            window.location.href = "login.html";
+        });
+
+
+        </script>
+
+        <style>
+            /* Header & Nav styling */
+            .site-header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 50px;
+                z-index: 2;
+                color: #fff;
+                font-weight: 600;
+            }
+
+            .site-header h1 {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+                color: #fff;
+            }
+
+            .site-header nav a {
+                margin-left: 20px;
+                text-decoration: none;
+                padding: 10px 20px;
+                border-radius: 8px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                color: #fff;
+                background: rgba(255,255,255,0.1);
+            }
+
+            .site-header nav a:hover {
+                background: var(--main-color);
+                color: #fff;
+                transform: translateY(-2px);
+            }
+
+            /* Optional: Highlight Logout separately */
+            .site-header nav a[href="login.html"] {
+                background: rgba(255, 50, 50, 0.2);
+            }
+
+            .site-header nav a[href="login.html"]:hover {
+                background: #ff4c4c;
+                color: #fff;
+            }
+
+            .dashboard-main { 
+                position:absolute; 
+                top:60px; 
+                left:50%; 
+                transform:translateX(-50%); 
+                width:90%; 
+                max-width:900px; 
+                color:#fff; 
+                text-align:center; 
+                z-index:1;
+            }
+            .notes-container { 
+                display:flex; 
+                flex-wrap:wrap; 
+                gap:15px; 
+                justify-content:center; 
+                margin-top:20px; 
+            }
+            .note-card { 
+                background: rgba(255,255,255,0.1); 
+                padding:20px; 
+                border-radius:10px; 
+                min-width:150px; 
+                min-height:80px; 
+                display:flex; 
+                align-items:center; 
+                justify-content:center; 
+                font-weight:500; transition:all 0.3s ease; 
+                cursor:pointer; 
+            }
+            .note-card:hover { 
+                background: rgba(255,255,255,0.25); 
+                transform:translateY(-5px); 
+            }
+            #add-note { 
+                margin-top:25px; 
+                padding:12px 25px; 
+                border:none; 
+                border-radius:8px; 
+                background:var(--main-color); 
+                color:#fff; 
+                cursor:pointer; 
+                font-weight:600; 
+                transition:all 0.3s ease; 
+            }
+            #add-note:hover { 
+                background:#36b48c; 
+                transform:translateY(-2px);
+            }
+        </style>
+
+    </body>
+</html>
